@@ -1,0 +1,23 @@
+DEPENDENCIES = \
+noTradiationModel/noTradiationModel/noTradiationModel.dep\
+noTradiationModel/noTradiationModel/noTradiationModelNew.dep\
+noTradiationModel/DORT/DORT/DORT.dep\
+noTradiationModel/DORT/quadrature/quadrature.dep\
+noTradiationModel/DORT/discreteOrdinate/discreteOrdinate.dep\
+noTradiationModel/DORT/discreteOrdinate/cleanDiscOrd/cleanDiscOrd.dep\
+noTradiationModel/DORT/discreteOrdinate/homoDiscOrd/homoDiscOrd.dep\
+noTradiationModel/DORT/discreteOrdinate/fullDiscOrd/fullDiscOrd.dep\
+noTradiationModel/DORT/specularIndexer/specularIndexer.dep\
+noTradiationModel/DORT/Source/radSource.dep\
+noTradiationModel/DORT/Source/radSourceNew.dep\
+noTradiationModel/DORT/Source/isotropicRadSource.dep\
+noTradiationModel/DORT/Source/constConeRadSource.dep\
+noTradiationModel/DORT/Source/parallelRadSource.dep\
+submodels/phaseFuncModel/phaseFuncModel/phaseFuncModel.dep\
+submodels/phaseFuncModel/phaseFuncModel/phaseFuncModelNew.dep\
+submodels/phaseFuncModel/isotropicPhaseFunc/isotropicPhaseFunc.dep\
+submodels/phaseFuncModel/HenyeyGreenteinsPhaseFunc/HenyeyGreenteinsPhaseFunc.dep\
+submodels/extintionModel/extintionModel/extintionModel.dep\
+submodels/extintionModel/extintionModel/extintionModelNew.dep\
+submodels/extintionModel/constantExtintion/constantExtintion.dep\
+derivedFvPatchFields/sourceGreyRadiation/sourceGreyRadiationMixedFvPatchScalarField.dep

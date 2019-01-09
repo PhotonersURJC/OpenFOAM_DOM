@@ -1,0 +1,23 @@
+OBJECTS = \
+$(OBJECTS_DIR)/noTradiationModel.o\
+$(OBJECTS_DIR)/noTradiationModelNew.o\
+$(OBJECTS_DIR)/DORT.o\
+$(OBJECTS_DIR)/quadrature.o\
+$(OBJECTS_DIR)/discreteOrdinate.o\
+$(OBJECTS_DIR)/cleanDiscOrd.o\
+$(OBJECTS_DIR)/homoDiscOrd.o\
+$(OBJECTS_DIR)/fullDiscOrd.o\
+$(OBJECTS_DIR)/specularIndexer.o\
+$(OBJECTS_DIR)/radSource.o\
+$(OBJECTS_DIR)/radSourceNew.o\
+$(OBJECTS_DIR)/isotropicRadSource.o\
+$(OBJECTS_DIR)/constConeRadSource.o\
+$(OBJECTS_DIR)/parallelRadSource.o\
+$(OBJECTS_DIR)/phaseFuncModel.o\
+$(OBJECTS_DIR)/phaseFuncModelNew.o\
+$(OBJECTS_DIR)/isotropicPhaseFunc.o\
+$(OBJECTS_DIR)/HenyeyGreenteinsPhaseFunc.o\
+$(OBJECTS_DIR)/extintionModel.o\
+$(OBJECTS_DIR)/extintionModelNew.o\
+$(OBJECTS_DIR)/constantExtintion.o\
+$(OBJECTS_DIR)/sourceGreyRadiationMixedFvPatchScalarField.o

@@ -1,0 +1,164 @@
+/*---------------------------------------------------------------------------*\
+             Discrete Ordinate Method Radiation Model for OpenFOAM.
+
+
+Code corresponding to the article entitled:
+
+
+"Improved Discrete Ordinate Method for accurate simulation radiation transport
+                  using solar and LED light sources"
+
+
+by:
+
+
+José Moreno, Cintia Casado, Javier Marugán
+
+Department of Chemical and Environmental Technology,
+
+ESCET, Universidad Rey Juan Carlos,
+
+C/Tulipán s/n, 28933 Móstoles (Madrid), Spain
+
+Tel. +34 91 664 7466; E-mail: javier.marugan@urjc.es
+
+\*---------------------------------------------------------------------------*/
+
+#include "homoExtDO.H"
+#include "fvm.H"
+#include "DORT.H"
+#include "quadrature.H"
+#include "constants.H"
+
+using namespace Foam::constant;
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::radiation::homoExtDO::homoExtDO
+(
+    const DORT& dort,
+    const quadrature& quad,
+    const fvMesh& mesh,
+    const scalar phi,
+    const scalar theta,
+    const scalar deltaPhi,
+    const scalar deltaTheta,
+    const label nLambda,
+    const label rayId,
+    const List<vector> mainAxis,
+    const scalar k
+)
+:
+    discreteOrdinate
+    (
+        dort,
+        quad,
+        mesh,
+        phi,
+        theta,
+        deltaPhi,
+        deltaTheta,
+        nLambda,
+        rayId,
+        mainAxis
+    ),
+    inScatter_(nLambda),
+    k_("k", dimless/dimLength, k)
+{
+    k_ = k_*omega_; //To avoid repeat it in every iteration
+    forAll(ILambda_, lambdaI)
+    {
+	inScatter_.set
+	(
+	    lambdaI,
+	    new volScalarField
+	    (
+		IOobject
+		(
+		    "inScatter",
+		    mesh_.time().timeName(),
+		    mesh_,
+		    IOobject::NO_READ,
+		    IOobject::NO_WRITE
+		),
+		mesh_,
+		dimensionedScalar("inScatter", dimMass/(dimLength*pow3(dimTime)), 0.0)
+	    )
+	);
+    }
+}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+Foam::radiation::homoExtDO::~homoExtDO()
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+Foam::scalar Foam::radiation::homoExtDO::correct
+()
+{
+    scalar maxResidual = -GREAT;
+
+    forAll(ILambda_, lambdaI)
+    {
+        const surfaceScalarField Ji(dAve_ & mesh_.Sf());
+		if(nLambda_>1)
+		{
+			k_.value()=(max(dort_.kappaLambda(lambdaI)).value() + max(dort_.sigmaLambda(lambdaI)).value())*omega_;
+		}
+        fvScalarMatrix IiEq =
+        (
+            fvm::div(Ji, ILambda_[lambdaI], "div(Ji,Ii_h)")
+          + fvm::Sp(k_, ILambda_[lambdaI]) == inScatter_[lambdaI]
+        ); //scattering Matrix includes sigma value
+
+        IiEq.relax();
+        const solverPerformance ILambdaSol = solve
+        (
+            IiEq,
+            mesh_.solver("Ii")
+        );
+
+        const scalar initialRes =
+            ILambdaSol.initialResidual()*omega_/quad_.omegaMax();
+		ILambda_[lambdaI].max(0.0);
+        maxResidual = max(initialRes, maxResidual);
+    }
+
+    return maxResidual;
+}
+
+void Foam::radiation::homoExtDO::setBandScatter
+ (const label lambdaI, const volScalarField value)
+{
+    inScatter_[lambdaI]=value;
+}
+
+void Foam::radiation::homoExtDO::changeBand
+ (const label lambdaI)
+{
+	IOobject IHeader
+    (
+        "IBand_" +  name(lambdaI),
+        mesh_.time().timeName(),
+        mesh_,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    );
+	if (IHeader.good())
+	{
+		ILambda_.set
+		(
+			0,
+			new volScalarField(IHeader, mesh_)
+		);
+	}
+	k_=max(dort_.kappaLambda(lambdaI)).value() + max(dort_.sigmaLambda(lambdaI)).value();
+}
+
+
+// ************************************************************************* //
