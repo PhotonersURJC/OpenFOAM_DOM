@@ -27,7 +27,8 @@ Class
 
 Description
     Discrete Ordinate in an optically heterogenous region
-	Full transcription of RTE, extintion coeffcients stored as volFields.
+	Extintion coefficients stored as volFields
+	No thermal emission
 
 SourceFiles
     heteroExtDO.C

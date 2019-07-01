@@ -26,8 +26,8 @@ Class
     Foam::radiation::absorptionDO
 
 Description
-    Discrete Ordinate in a region with homogeneous optical properties
-	Scattering matrix includes scattering coefficent, to optimize iterations
+    Discrete Ordinate in an homogeneous absorptive region.
+	No thermal emission, nor radiation scattering
 
 SourceFiles
     absorptionDO.C

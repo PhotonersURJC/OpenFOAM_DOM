@@ -27,7 +27,8 @@ Class
 
 Description
     Discrete Ordinate in an optically heterogenous region
-	Full transcription of RTE, extintion coeffcients stored as volFields.
+	Full transcription of RTE, extintion coeffcients stored as volFields
+	Considered gray in each band and cell, emission coeff = absorption coeff
 
 SourceFiles
     fullDO.C

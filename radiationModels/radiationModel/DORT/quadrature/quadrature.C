@@ -135,7 +135,7 @@ void Foam::radiation::quadrature::initialise()
 	scalar planeOpening = 0.0;
 	if(mesh_.nSolutionD()==2)
 	{
-		//establezco ejes
+		//setting axis
 		planeOpening = opening;
 		opening = 0.0;
 		deltaTheta = pi;

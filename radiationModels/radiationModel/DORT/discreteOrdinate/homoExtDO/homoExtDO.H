@@ -28,6 +28,7 @@ Class
 Description
     Discrete Ordinate in a region with homogeneous optical properties
 	Scattering matrix includes scattering coefficent, to optimize iterations
+	No thermal emission
 
 SourceFiles
     homoExtDO.C

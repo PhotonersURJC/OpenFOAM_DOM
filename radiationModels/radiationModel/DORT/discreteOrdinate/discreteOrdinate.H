@@ -27,10 +27,13 @@ Class
 
 Description
     Abstract class for radiative intensity storage in a given solid angle.
-	May be:
-		- cleanDiscOrd: Transparent media
-		- homoDiscOrd: Absorptive and scattering media, homogeneous coeffs
-		- fullDiscOrd: same as homoDiscOrd, but heterogeneous coeffs
+	During run-time quadrature generation, it chooses between:
+		- cleanDO: Transparent media, no thermal emission
+		- absorptionDO: Includes homogeneous absorption
+		- thermoAbsorptionDO: homogeneous absorption and thermal emission
+		- homoDO: Absorptive and scattering media, homogeneous coeffs. No thermal
+		- heteroExtDO: same as homoDiscOrd, but heterogeneous coeffs
+		- fullDO: Heterogeneous absorption, scattering and thermal emission
 
 SourceFiles
     discreteOrdinate.C
