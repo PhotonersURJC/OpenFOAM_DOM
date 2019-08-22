@@ -47,4 +47,4 @@ submodels/phaseFuncModel/coeffPhaseFunc/coeffPhaseFunc.C
 /* Boundaries */
 derivedFvPatchFields/sourceGreyRadiation/sourceGreyRadiationMixedFvPatchScalarField.C
 
-LIB = $(FOAM_LIBBIN)/libnewRadiationModels
+LIB = $(FOAM_USER_LIBBIN)/libnewRadiationModels

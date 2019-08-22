@@ -1,39 +1,35 @@
 /*---------------------------------------------------------------------------*\
-             Discrete Ordinate Method Radiation Model for OpenFOAM.
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
 
+    OpenFOAM is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-Code corresponding to the article entitled:
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
-
-"Improved Discrete Ordinate Method for accurate simulation radiation transport
-                  using solar and LED light sources"
-
-
-by:
-
-
-José Moreno, Cintia Casado, Javier Marugán
-
-Department of Chemical and Environmental Technology,
-
-ESCET, Universidad Rey Juan Carlos,
-
-C/Tulipán s/n, 28933 Móstoles (Madrid), Spain
-
-Tel. +34 91 664 7466; E-mail: javier.marugan@urjc.es
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
     Foam::radiation::discreteOrdinate
 
 Description
     Abstract class for radiative intensity storage in a given solid angle.
-	During run-time quadrature generation, it chooses between:
-		- cleanDO: Transparent media, no thermal emission
-		- absorptionDO: Includes homogeneous absorption
-		- thermoAbsorptionDO: homogeneous absorption and thermal emission
-		- homoDO: Absorptive and scattering media, homogeneous coeffs. No thermal
-		- heteroExtDO: same as homoDiscOrd, but heterogeneous coeffs
-		- fullDO: Heterogeneous absorption, scattering and thermal emission
+	May be:
+		- cleanDiscOrd: Transparent media
+		- homoDiscOrd: Absorptive and scattering media, homogeneous coeffs
+		- fullDiscOrd: same as homoDiscOrd, but heterogeneous coeffs
 
 SourceFiles
     discreteOrdinate.C

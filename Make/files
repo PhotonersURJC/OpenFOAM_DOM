@@ -1,4 +1,4 @@
 MultiRegionRadiationFoam.C
 
-EXE = $(FOAM_APPBIN)/MultiRegionRadiationFoam
+EXE = $(FOAM_USER_APPBIN)/MultiRegionRadiationFoam
 

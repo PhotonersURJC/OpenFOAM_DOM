@@ -1,26 +1,25 @@
 /*---------------------------------------------------------------------------*\
-             Discrete Ordinate Method Radiation Model for OpenFOAM.
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
 
+    OpenFOAM is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-Code corresponding to the article entitled:
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
-
-"Improved Discrete Ordinate Method for accurate simulation radiation transport
-                  using solar and LED light sources"
-
-
-by:
-
-
-José Moreno, Cintia Casado, Javier Marugán
-
-Department of Chemical and Environmental Technology,
-
-ESCET, Universidad Rey Juan Carlos,
-
-C/Tulipán s/n, 28933 Móstoles (Madrid), Spain
-
-Tel. +34 91 664 7466; E-mail: javier.marugan@urjc.es
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 \*---------------------------------------------------------------------------*/
 
@@ -135,7 +134,7 @@ void Foam::radiation::quadrature::initialise()
 	scalar planeOpening = 0.0;
 	if(mesh_.nSolutionD()==2)
 	{
-		//setting axis
+		//establezco ejes
 		planeOpening = opening;
 		opening = 0.0;
 		deltaTheta = pi;
@@ -670,6 +669,7 @@ bool Foam::radiation::quadrature::calculate()
     if (maxResidual < convergence_)						//All rays converged
     {
 		updateG();
+		Info << "Radiation initial residual in quadrature " << modelNumber_ << ": " << maxResidual;
         return true;									//Only one iteration till converged->quadrature converges
     }
     do
@@ -720,6 +720,7 @@ bool Foam::radiation::quadrature::calculate()
 		}
     } while (maxResidual > convergence_ && radIter < maxIter_);
     updateG();
+	Info << "Radiation initial residual in quadrature " << modelNumber_ << ": " << maxResidual << endl;
     return false;
 }
 
