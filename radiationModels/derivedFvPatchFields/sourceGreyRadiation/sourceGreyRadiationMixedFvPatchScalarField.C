@@ -280,7 +280,7 @@ updateCoeffs()
 	scalarField specularReflected = quad.getSpec(patchI, rayId, lambdaId)*(refCoeff_*(1.0-refDifF_));
 	scalarField thermalEmission = specularReflected;
 	if(dort.thermo())
-		thermalEmission = (1.0-transCoeff_-refCoeff_)*dort.getThermal(patchI,lambdaId);
+		thermalEmission = (1.0-transCoeff_-refCoeff_)*dort.blackBody().bLambda(lambdaId).boundaryField()[patchI];
     forAll(Iw, faceI)
     {
         if ((-n[faceI] & myRayId) > 0.0)

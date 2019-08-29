@@ -175,26 +175,6 @@ void Foam::radiation::DORT::initialise(const dictionary& dict)
 	{
 		bandsLimits_ = extintion_->getBandsLimits();
 		thermo_ = true;
-		forAll(Elambda_, lambdaI)
-		{
-			Elambda_.set
-			(
-				lambdaI,
-				new volScalarField
-				(
-					IOobject
-					(
-						"E_lambda_" + Foam::name(lambdaI),
-						mesh_.time().timeName(),
-						mesh_,
-						IOobject::NO_READ,
-						IOobject::NO_WRITE
-					),
-					mesh_,
-					dimensionedScalar("E_lambda_" + Foam::name(lambdaI), dimMass/(pow3(dimTime)*dimLength), 0.0)
-				)
-			);
-		}
 	}
 	extintion_->kappaCorrect(kappa_, kappaLambda_);
 	extintion_->sigmaCorrect(sigma_, sigmaLambda_);
@@ -223,7 +203,7 @@ void Foam::radiation::DORT::initialise(const dictionary& dict)
 	        {
 				submodels_.set(
 	            submodels_.size()-1,
-	            new quadrature(*this, mesh_, indexer, sources_[sources_.size()-1],serialQuads));
+	            new quadrature(*this, mesh_, indexer, sources_[sources_.size()-1],serialQuads, blackBody_));
 				submodels_[submodels_.size()-1].initialise();
 				if(scatter)
 				{
@@ -318,7 +298,7 @@ void Foam::radiation::DORT::readOwnDict(const dictionary& dict)
 	QrLambda_.resize(nLambda_);
 	QinLambda_.resize(nLambda_);
 	eAlambda_.resize(nLambda_);
-	Elambda_.resize(nLambda_);
+	blackBody_.resizeBands(nLambda_);
 	nLambda_= 1;
     convergence_ = dict.lookupOrDefault<scalar>("convergence", 0.0);
     maxIter_=(dict.lookupOrDefault<label>("inScatterIters", 50));
@@ -384,12 +364,12 @@ Foam::radiation::DORT::DORT(const volScalarField& T)
 	actualBand_(0),
     kappaLambda_(nLambda_),
     sigmaLambda_(nLambda_),
-	Elambda_(nLambda_),
     submodels_(0),
 	sources_(0),
     convergence_(coeffs_.lookupOrDefault<scalar>("convergence", 0.0)),
     maxIter_(coeffs_.lookupOrDefault<label>("maxIter", 50)),
-	thermo_(false)
+	thermo_(false),
+	blackBody_(nLambda_, T_)
 {
     initialise(*this);
 }
@@ -455,12 +435,12 @@ Foam::radiation::DORT::DORT
 	actualBand_(0),
     kappaLambda_(0),
     sigmaLambda_(0),
-	Elambda_(0),
 	submodels_(0),
 	sources_(0),
     convergence_(0.0),
     maxIter_(0),
-	thermo_(false)
+	thermo_(false),
+	blackBody_(nLambda_, T_)
 {
 	readOwnDict(dict);
     initialise(dict);
@@ -490,7 +470,7 @@ bool Foam::radiation::DORT::read()
 void Foam::radiation::DORT::createQuad(const label model)
 {
 	bool serialQuads = (nQuad_==0);
-	submodels_.set(model,new quadrature(*this, mesh_, model, sources_[model], serialQuads));
+	submodels_.set(model,new quadrature(*this, mesh_, model, sources_[model], serialQuads, blackBody_));
 	actualBand_=0;
 	bool scatter = false;
 	forAll(sigmaLambda_,lambdaI)
@@ -528,12 +508,7 @@ void Foam::radiation::DORT::changeBand(const label model, const label band)
 bool Foam::radiation::DORT::calculateQuad(const label model)
 {
 	if(thermo_)
-	{
-		if(bandsLimits_.size()==0)
-				setNoBandEmission();
-			else
-				setBandEmission(actualBand_);
-	}
+		blackBody_.correct(actualBand_,bandsLimits_[actualBand_]);
 	bool Converged = submodels_[model].calculate();	//Quadrature has already set resolution to single band when created
 	modelsG_.set(model,submodels_[model].Glambda(actualBand_));
 	modelsQin_.set(model,submodels_[model].QinLambda(actualBand_));
@@ -545,12 +520,9 @@ bool Foam::radiation::DORT::calculate()
 {
 	if(thermo_)
 	{
-		forAll(Elambda_,lambdaI)
+		forAll(Glambda_,lambdaI)
 		{
-			if(bandsLimits_.size()==0)
-				setNoBandEmission();
-			else
-				setBandEmission(lambdaI);
+			blackBody_.correct(lambdaI,bandsLimits_[lambdaI]);
 		}
 	}
 	forAll(Glambda_,lambdaI)
@@ -626,46 +598,6 @@ void Foam::radiation::DORT::generateDicts
 	newDict.add(keyType("extintionModel"),lookup("extintionModel"));	
 }
 
-void Foam::radiation::DORT::setBandEmission
-(Foam::label lambdaI)
-{
-	scalar lambda0 = bandsLimits_[lambdaI][0];
-	scalar lambda1 = bandsLimits_[lambdaI][1];
-	scalar C10 = 7.49e-16*(lambda1-lambda0)/pi;
-	scalar C20 = 1.4385e-2/lambda0;
-	scalar C21 = 1.4385e-2/lambda1;
-	scalar C11 = C10*pow(lambda1,-5.0);
-	C10 *= pow(lambda0,-5.0);
-	forAll(T_, i)
-		Elambda_[i]=(C10/(exp(C20/T_[i])-1.0) + C11/(exp(C21/T_[i])-1.0))*kappaLambda_[lambdaI][i];
-}
-
-void Foam::radiation::DORT::setNoBandEmission ()
-{
-	Elambda_[0] = dimensionedScalar("zero",dimMass/(pow3(dimTime)*dimLength), 0.0);
-	Elambda_[0] += (T_*T_*T_*T_)*Foam::constant::physicoChemical::sigma*kappa_/pi;
-}
-
-Foam::scalarField Foam::radiation::DORT::getThermal(Foam::label patchI, Foam::label lambdaId) const
-{
-	if(bandsLimits_.size()==0){
-		scalarField T = T_.boundaryField()[patchI];
-		return (T * T * T * T)*Foam::constant::physicoChemical::sigma.value()/pi;
-	}
-	scalarField T(T_.boundaryField()[patchI].size(),0.0);
-	T += T_.boundaryField()[patchI];
-	scalar lambda0 = bandsLimits_[lambdaId][0];
-	scalar lambda1 = bandsLimits_[lambdaId][1];
-	scalar C10 = 7.49e-16*(lambda1-lambda0)/pi;
-	scalar C20 = 1.4385e-2/lambda0;
-	scalar C21 = 1.4385e-2/lambda1;
-	scalar C11 = C10*pow(lambda1,-5.0);
-	C10 *= pow(lambda0,-5.0);
-	forAll(T, i)
-		T[i]=C10/(exp(C20/T[i])-1.0) + C11/(exp(C21/T[i])-1.0);
-	return T;
-}
-
 Foam::tmp<Foam::volScalarField> Foam::radiation::DORT::Rp() const
 {
     return tmp<volScalarField>
@@ -690,11 +622,11 @@ Foam::tmp<Foam::volScalarField> Foam::radiation::DORT::Ru() const
 {
     volScalarField G = Glambda_[0];
 
-    volScalarField E = Elambda_[0];
+    volScalarField E = blackBody_.bLambda(0);
 	for(int i = 1; i < nLambda_; i++)
 	{
 		G+=Glambda_[i];
-		E+=Elambda_[i];
+		E+=blackBody_.bLambda(i);
 	}
     const volScalarField a = extintion_->fullKappa();
 

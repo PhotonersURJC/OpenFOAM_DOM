@@ -45,7 +45,8 @@ Foam::radiation::fullDO::fullDO
     const scalar deltaTheta,
     const label nLambda,
     const label rayId,
-    const List<vector> mainAxis
+    const List<vector> mainAxis,
+	const blackBodyEmissionRev& blackBody
 )
 :
     discreteOrdinate
@@ -62,7 +63,8 @@ Foam::radiation::fullDO::fullDO
         mainAxis
     ),
     inScatter_(nLambda),
-	actualBand_(0)
+	actualBand_(0),
+	blackBody_(blackBody)
 {
     forAll(ILambda_, lambdaI)
     {
@@ -114,7 +116,7 @@ Foam::scalar Foam::radiation::fullDO::correct
         (
             fvm::div(Ji, ILambda_[lambdaI], "div(Ji,Ii_h)")
           + fvm::Sp((kappa+sigma)*omega_, ILambda_[lambdaI])
-          == sigma*inScatter_[lambdaI] + dort_.Elambda(actualLambda)
+          == sigma*inScatter_[lambdaI] + blackBody_.bLambda(actualLambda)
         );
         
 
@@ -122,7 +124,7 @@ Foam::scalar Foam::radiation::fullDO::correct
         const solverPerformance ILambdaSol = solve
         (
             IiEq,
-            mesh_.solver("Ii")
+            "Ii"
         );
 
         const scalar initialRes =

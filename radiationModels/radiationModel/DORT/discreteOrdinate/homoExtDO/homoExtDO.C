@@ -118,7 +118,7 @@ Foam::scalar Foam::radiation::homoExtDO::correct
         const solverPerformance ILambdaSol = solve
         (
             IiEq,
-            mesh_.solver("Ii")
+            "Ii"
         );
 
         const scalar initialRes =

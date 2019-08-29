@@ -39,7 +39,7 @@ SourceFiles
 #ifndef discreteOrdinate_H
 #define discreteOrdinate_H
 
-#include "volFields.H"
+#include "blackBodyEmissionRev.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

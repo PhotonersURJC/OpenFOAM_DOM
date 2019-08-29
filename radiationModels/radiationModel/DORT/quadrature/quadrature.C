@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "quadrature.H"
+#include "DORT.H"
 #include "fullDO.H"
 #include "heteroExtDO.H"
 #include "homoExtDO.H"
@@ -182,7 +183,8 @@ void Foam::radiation::quadrature::initialise()
                         deltaTheta,
                         discOrdBands,
                         i,
-						mainAxis
+						mainAxis,
+						blackBody_
                     )
                 );
 			}
@@ -244,7 +246,8 @@ void Foam::radiation::quadrature::initialise()
                         discOrdBands,
                         i,
 						mainAxis,
-                        max(DORT_.kappaLambda(0)).value()
+                        max(DORT_.kappaLambda(0)).value(),
+						blackBody_
                     )
                 );
 			}
@@ -301,9 +304,7 @@ void Foam::radiation::quadrature::initialise()
     }
 
 	if(lastSpecked_>0)
-	{
 		specularGuiding(mainAxis, cut, opening);
-	}
 	
     Info<< "quadrature : Allocated " << IRay_.size()
         << " rays with average orientation:" << nl;
@@ -311,9 +312,7 @@ void Foam::radiation::quadrature::initialise()
     forAll(IRay_, rayId)
     {
         if (omegaMax_ <  IRay_[rayId].omega())
-        {
             omegaMax_ = IRay_[rayId].omega();
-        }
         Info<< '\t' << "ray" << rayId << " : " << "omega : "
             << '\t' << IRay_[rayId].omega() << '\t' << "dir : " 
 	    << '\t' << IRay_[rayId].d() << nl;
@@ -561,7 +560,16 @@ void Foam::radiation::quadrature::updateSpecular(const Foam::label lambdaI)
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::radiation::quadrature::quadrature(const DORT& dort, const fvMesh& mesh, const label modelNumber, radSource& radSource, const bool serialQuad):
+Foam::radiation::quadrature::quadrature
+(
+	const DORT& dort,
+	const fvMesh& mesh,
+	const label modelNumber,
+	radSource& radSource,
+	const bool serialQuad,
+	const blackBodyEmissionRev& blackBody
+)
+:
 
     DORT_(dort),
     modelNumber_(modelNumber),
@@ -592,7 +600,8 @@ Foam::radiation::quadrature::quadrature(const DORT& dort, const fvMesh& mesh, co
 	specPositions_(mesh.boundary().size(),-1),
 	specOrders_(mesh.boundary().size(),false),
 	specGuiders_(0),
-	lastSpecked_(0)
+	lastSpecked_(0),
+	blackBody_(blackBody)
 {
     //initialise();
 }

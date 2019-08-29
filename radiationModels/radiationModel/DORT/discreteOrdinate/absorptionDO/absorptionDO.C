@@ -97,7 +97,7 @@ Foam::scalar Foam::radiation::absorptionDO::correct
         const solverPerformance ILambdaSol = solve
         (
             IiEq,
-            mesh_.solver("Ii")
+            "Ii"
         );
 
         const scalar initialRes =

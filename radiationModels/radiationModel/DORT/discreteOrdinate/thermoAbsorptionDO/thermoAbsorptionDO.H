@@ -56,6 +56,9 @@ class thermoAbsorptionDO
 
 	//- absorption coefficient
     dimensionedScalar k_;
+	
+	//- Black body reference
+    const blackBodyEmissionRev& blackBody_;
 
 public:
 
@@ -74,7 +77,8 @@ public:
             const label lambda,
             const label rayId,
 	    const List<vector> mainAxis,
-            const scalar k
+            const scalar k,
+			const blackBodyEmissionRev& blackBody
         );
 
 

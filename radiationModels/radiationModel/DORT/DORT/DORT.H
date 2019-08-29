@@ -78,7 +78,6 @@ SourceFiles
 #define radiationModelDORT_H
 
 #include "quadrature.H"
-#include "radSource.H"
 #include "newRadiationModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -147,9 +146,6 @@ class DORT
 		
         //- Wavelength total scattering coefficient [1/m]
         PtrList<volScalarField> sigmaLambda_;
-		
-		//- Temperature emission [W/m3]
-		PtrList<volScalarField> Elambda_;
 
 	//- Sub models list
 	PtrList<quadrature> submodels_;
@@ -168,6 +164,9 @@ class DORT
 		
 		//- Flag of thermal calculation
 		bool thermo_;
+		
+		//- Black body
+        blackBodyEmissionRev blackBody_;
 
     // Private Member Functions
 
@@ -182,12 +181,6 @@ class DORT
 
         //- Disallow default bitwise assignment
         void operator=(const DORT&);
-		
-		//- Update gray temperature emission
-		void setNoBandEmission ();
-		
-		//- Update band temperature emission
-		void setBandEmission (label lambdaI);
 
 
 public:
@@ -284,9 +277,6 @@ public:
 
             //- Const access to incident radiative heat flux field
             inline const volScalarField& QinLambda(const label lambdaI) const;
-			
-			//- Const access to volumetric emitted intensity
-			inline const volScalarField& Elambda(const label lambdaI) const;
 
             //- Const access to specific quadrature
             const quadrature& quadratureById(const label modelIndex) const;
@@ -296,12 +286,13 @@ public:
 
             //- Const acces to convergence
             inline scalar convergence() const;
+
+            //- Const access to black body
+            inline const blackBodyEmissionRev& blackBody() const;
 			
 			tmp<volScalarField> Rp() const;
 			
 			tmp<volScalarField> Ru() const;
-			
-			scalarField getThermal(label patchI, label lambdaId) const;
 };
 
 

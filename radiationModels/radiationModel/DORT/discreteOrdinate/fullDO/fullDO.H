@@ -54,10 +54,13 @@ class fullDO
     public discreteOrdinate
 {
 
-        //- List of pointers to intensity inScatter fields for given wavelengths
-        PtrList<volScalarField> inScatter_;
-		
-		label actualBand_;
+	//- List of pointers to intensity inScatter fields for given wavelengths
+	PtrList<volScalarField> inScatter_;
+	
+	label actualBand_;
+	
+	//- Black body reference
+	const blackBodyEmissionRev& blackBody_;
 
 public:
 
@@ -75,7 +78,8 @@ public:
             const scalar deltaTheta,
             const label lambda,
             const label rayId,
-	    const List<vector> mainAxis
+	    const List<vector> mainAxis,
+			const blackBodyEmissionRev& blackBody
         );
 
 

@@ -88,7 +88,7 @@ Foam::scalar Foam::radiation::cleanDO::correct
         const solverPerformance ILambdaSol = solve
         (
             IiEq,
-            mesh_.solver("Ii")
+            "Ii"
         );
         const scalar initialRes =
             ILambdaSol.initialResidual()*omega_/quad_.omegaMax();

@@ -47,7 +47,6 @@ SourceFiles
 
 #include "discreteOrdinate.H"
 #include "specularGuide.H"
-#include "DORT.H"
 #include "radSource.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -60,6 +59,7 @@ namespace radiation
 /*---------------------------------------------------------------------------*\
                            Class quadrature Declaration
 \*---------------------------------------------------------------------------*/
+class DORT;
 
 class quadrature
 {
@@ -158,6 +158,9 @@ class quadrature
 		PtrList<specularGuide> specGuiders_;
 		
 		label lastSpecked_;
+		
+		//- Black body reference
+        const blackBodyEmissionRev& blackBody_;
 
     // Private Member Functions
 
@@ -183,7 +186,8 @@ public:
     // Constructors
 
         //- Construct from components
-        quadrature(const DORT& DORT, const fvMesh& mesh, const label modelNumber,  radSource& radSource, const bool serialQuad);
+        quadrature(const DORT& DORT, const fvMesh& mesh, const label modelNumber,  radSource& radSource, 
+			const bool serialQuad, const blackBodyEmissionRev& blackBody);
 
     //- Destructor
     virtual ~quadrature();

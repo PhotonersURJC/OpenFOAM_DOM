@@ -104,14 +104,6 @@ inline const Foam::volScalarField& Foam::radiation::DORT::QinLambda
     return QinLambda_[lambdaI];
 }
 
-inline const Foam::volScalarField& Foam::radiation::DORT::Elambda
-(
-	const label lambdaI
-) const
-{
-    return Elambda_[lambdaI];
-}
-
 inline Foam::label Foam::radiation::DORT::maxIter() const
 {
     return maxIter_;
@@ -122,5 +114,9 @@ inline Foam::scalar Foam::radiation::DORT::convergence() const
     return convergence_;
 }
 
+inline const Foam::radiation::blackBodyEmissionRev& Foam::radiation::DORT::blackBody() const
+{
+    return blackBody_;
+}
 
 // ************************************************************************* //

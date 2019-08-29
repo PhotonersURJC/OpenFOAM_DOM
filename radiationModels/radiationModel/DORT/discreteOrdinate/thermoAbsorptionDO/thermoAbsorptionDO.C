@@ -46,7 +46,8 @@ Foam::radiation::thermoAbsorptionDO::thermoAbsorptionDO
     const label nLambda,
     const label rayId,
     const List<vector> mainAxis,
-    const scalar k
+    const scalar k,
+	const blackBodyEmissionRev& blackBody
 )
 :
     discreteOrdinate
@@ -62,7 +63,8 @@ Foam::radiation::thermoAbsorptionDO::thermoAbsorptionDO
         rayId,
         mainAxis
     ),
-    k_("k", dimless/dimLength, k)
+    k_("k", dimless/dimLength, k),
+	blackBody_(blackBody)
 {
     k_ = k_*omega_; //To avoid repeat it in every iteration
 }
@@ -83,7 +85,6 @@ Foam::scalar Foam::radiation::thermoAbsorptionDO::correct
     forAll(ILambda_, lambdaI)
     {
         const surfaceScalarField Ji(dAve_ & mesh_.Sf());
-		const volScalarField emission = dort_.Elambda(lambdaI);
 		if(nLambda_>1)
 		{
 			k_.value()=max(dort_.kappaLambda(lambdaI)).value()*omega_;
@@ -91,13 +92,13 @@ Foam::scalar Foam::radiation::thermoAbsorptionDO::correct
         fvScalarMatrix IiEq =
         (
             fvm::div(Ji, ILambda_[lambdaI], "div(Ji,Ii_h)")
-          + fvm::Sp(k_, ILambda_[lambdaI]) == emission
+          + fvm::Sp(k_, ILambda_[lambdaI]) == k_*blackBody_.bLambda(lambdaI)
 		);
         IiEq.relax();
         const solverPerformance ILambdaSol = solve
         (
             IiEq,
-            mesh_.solver("Ii")
+            "Ii"
         );
         const scalar initialRes =
             ILambdaSol.initialResidual()*omega_/quad_.omegaMax();
