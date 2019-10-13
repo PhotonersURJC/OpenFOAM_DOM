@@ -14,6 +14,7 @@ radiationModel/DORT/DORT/DORT.C
 radiationModel/DORT/quadrature/quadrature.C
 radiationModel/DORT/discreteOrdinate/discreteOrdinate.C
 radiationModel/DORT/discreteOrdinate/cleanDO/cleanDO.C
+radiationModel/DORT/blackBodyEmission/blackBodyEmissionRev.C
 radiationModel/DORT/discreteOrdinate/absorptionDO/absorptionDO.C
 radiationModel/DORT/discreteOrdinate/thermoAbsorptionDO/thermoAbsorptionDO.C
 radiationModel/DORT/discreteOrdinate/homoExtDO/homoExtDO.C
